@@ -20,8 +20,12 @@ def get_time():
         lat = float(request.args.get('lat'))
         lng = float(request.args.get('lng'))
         
+        print(f"Received coordinates - lat: {lat}, lng: {lng}")
+        
         # Find the timezone
         timezone_str = tf.timezone_at(lng=lng, lat=lat)
+        print(f"Found timezone: {timezone_str}")
+        
         if not timezone_str:
             return jsonify({'error': 'No timezone found'}), 404
         
@@ -36,9 +40,11 @@ def get_time():
             'timezone': timezone_str.split('/')[-1].replace('_', ' ')
         }
         
+        print(f"Sending response: {response}")
         return jsonify(response)
         
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
