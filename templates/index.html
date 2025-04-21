@@ -46,13 +46,23 @@
         map.on('click',function(e){
             if(marker)map.removeLayer(marker)
             marker=L.marker(e.latlng).addTo(map)
+            
+            document.getElementById('time-display').innerHTML='Loading...'
+            
             fetch('/get_time?lat='+e.latlng.lat+'&lng='+e.latlng.lng)
-                .then(r=>r.json())
+                .then(r=>{
+                    if(!r.ok)throw new Error('Server error')
+                    return r.json()
+                })
                 .then(d=>{
-                    document.getElementById('time-display').innerHTML=d.time+'<br>'+d.date+'<br>'+d.timezone
+                    if(d.error)throw new Error(d.error)
+                    document.getElementById('time-display').innerHTML=
+                        'Time: '+d.time+'<br>'+
+                        'Date: '+d.date+'<br>'+
+                        'Timezone: '+d.timezone
                 })
                 .catch(e=>{
-                    document.getElementById('time-display').innerHTML='Error getting time'
+                    document.getElementById('time-display').innerHTML='Error: '+e.message
                 })
         })
         function updateCities(){
@@ -70,7 +80,8 @@
         }
         function selectCity(lat,lng){
             map.setView([lat,lng],4)
-            map.fire('click',{latlng:L.latLng(lat,lng)})
+            var clickEvent={latlng:L.latLng(lat,lng)}
+            map.fire('click',clickEvent)
         }
         updateCities()
         setInterval(updateCities,60000)
