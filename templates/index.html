@@ -48,13 +48,16 @@
             marker=L.marker(e.latlng).addTo(map)
             
             document.getElementById('time-display').innerHTML='Loading...'
+            console.log('Clicked at:', e.latlng)
             
             fetch('/get_time?lat='+e.latlng.lat+'&lng='+e.latlng.lng)
                 .then(r=>{
-                    if(!r.ok)throw new Error('Server error')
+                    console.log('Response status:', r.status)
+                    if(!r.ok)throw new Error('Server error: '+r.status)
                     return r.json()
                 })
                 .then(d=>{
+                    console.log('Received data:', d)
                     if(d.error)throw new Error(d.error)
                     document.getElementById('time-display').innerHTML=
                         'Time: '+d.time+'<br>'+
@@ -62,6 +65,7 @@
                         'Timezone: '+d.timezone
                 })
                 .catch(e=>{
+                    console.error('Error:', e)
                     document.getElementById('time-display').innerHTML='Error: '+e.message
                 })
         })
