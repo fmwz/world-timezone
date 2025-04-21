@@ -48,26 +48,18 @@
             marker=L.marker(e.latlng).addTo(map)
             
             document.getElementById('time-display').innerHTML='Loading...'
-            console.log('Clicked at:', e.latlng)
             
             fetch('/get_time?lat='+e.latlng.lat+'&lng='+e.latlng.lng)
-                .then(r=>{
-                    console.log('Response status:', r.status)
-                    if(!r.ok)throw new Error('Server error: '+r.status)
-                    return r.json()
-                })
+                .then(r=>r.json())
                 .then(d=>{
-                    console.log('Received data:', d)
-                    if(d.error)throw new Error(d.error)
-                    var timeDisplay=document.getElementById('time-display')
-                    timeDisplay.innerHTML=''
-                    timeDisplay.innerHTML+='Time: '+d.time+'<br>'
-                    timeDisplay.innerHTML+='Date: '+d.date+'<br>'
-                    timeDisplay.innerHTML+='Timezone: '+d.timezone
+                    if(d.error){
+                        document.getElementById('time-display').innerHTML='Error: '+d.error
+                    }else{
+                        document.getElementById('time-display').innerHTML=d.message
+                    }
                 })
                 .catch(e=>{
-                    console.error('Error:', e)
-                    document.getElementById('time-display').innerHTML='Error: '+e.message
+                    document.getElementById('time-display').innerHTML='Error getting time'
                 })
         })
         function updateCities(){
