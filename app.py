@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from timezonefinder import TimezoneFinder
 from datetime import datetime
 import pytz
+import os
 
 app = Flask(__name__)
 
@@ -41,4 +42,4 @@ def get_time():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run() 
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000))) 
