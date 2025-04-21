@@ -7,7 +7,15 @@
         body{margin:0;padding:0;font-family:Arial;background:#333}
         #map{width:60%;height:100vh;display:inline-block}
         #right-panel{width:40%;height:100vh;background:#222;display:inline-block;padding:20px}
-        .time-box{background:#444;padding:20px;color:white;margin-bottom:20px}
+        .time-box{
+            background:#444;
+            padding:20px;
+            color:white;
+            margin-bottom:20px;
+            font-size:24px;
+            border:2px solid #666;
+            min-height:150px;
+        }
         .cities-box{background:#444;padding:20px;color:white}
         .search-box{margin-bottom:20px}
         .search-input{width:100%;padding:10px;border:none;background:#555;color:white}
@@ -21,7 +29,7 @@
     <div id="map"></div>
     <div id="right-panel">
         <div class="time-box">
-            <div id="time-display">Click on map to see time</div>
+            <div id="time-display" style="line-height:1.5">Click on map to see time</div>
         </div>
         <div class="cities-box">
             <h3>Major Cities</h3>
@@ -43,36 +51,28 @@
             {name:'Dubai',country:'UAE',lat:25.2048,lng:55.2708},
             {name:'Sydney',country:'Australia',lat:-33.8688,lng:151.2093}
         ]
-
-        function showTime(data) {
-            var display = document.getElementById('time-display')
-            display.textContent = ''  // Clear existing content
-            var timeInfo = document.createElement('div')
-            timeInfo.innerHTML = data.message
-            display.appendChild(timeInfo)
-        }
-
         map.on('click',function(e){
             if(marker)map.removeLayer(marker)
             marker=L.marker(e.latlng).addTo(map)
             
-            var display = document.getElementById('time-display')
-            display.textContent = 'Loading...'
+            document.getElementById('time-display').innerHTML='Loading...'
             
             fetch('/get_time?lat='+e.latlng.lat+'&lng='+e.latlng.lng)
                 .then(r=>r.json())
                 .then(data=>{
                     if(data.error){
-                        display.textContent = 'Error: ' + data.error
+                        document.getElementById('time-display').innerHTML=data.error
                     }else{
-                        showTime(data)
+                        document.getElementById('time-display').innerHTML=
+                            'City: '+data.city+'<br>'+
+                            'Time: '+data.time+'<br>'+
+                            'Date: '+data.date
                     }
                 })
                 .catch(e=>{
-                    display.textContent = 'Error getting time'
+                    document.getElementById('time-display').innerHTML='Error getting time'
                 })
         })
-
         function updateCities(){
             var s=document.querySelector('.search-input').value.toLowerCase()
             var h=''
@@ -86,13 +86,11 @@
             })
             document.querySelector('.cities-list').innerHTML=h
         }
-
         function selectCity(lat,lng){
             map.setView([lat,lng],4)
             var clickEvent={latlng:L.latLng(lat,lng)}
             map.fire('click',clickEvent)
         }
-
         updateCities()
         setInterval(updateCities,60000)
         document.querySelector('.search-input').addEventListener('input',updateCities)
