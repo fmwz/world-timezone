@@ -59,10 +59,11 @@
                 .then(d=>{
                     console.log('Received data:', d)
                     if(d.error)throw new Error(d.error)
-                    document.getElementById('time-display').innerHTML=
-                        'Time: '+d.time+'<br>'+
-                        'Date: '+d.date+'<br>'+
-                        'Timezone: '+d.timezone
+                    var timeDisplay=document.getElementById('time-display')
+                    timeDisplay.innerHTML=''
+                    timeDisplay.innerHTML+='Time: '+d.time+'<br>'
+                    timeDisplay.innerHTML+='Date: '+d.date+'<br>'
+                    timeDisplay.innerHTML+='Timezone: '+d.timezone
                 })
                 .catch(e=>{
                     console.error('Error:', e)
