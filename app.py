@@ -23,23 +23,20 @@ def get_time():
         # Find the timezone
         timezone_str = tf.timezone_at(lng=lng, lat=lat)
         if not timezone_str:
-            return jsonify({'error': 'No timezone found'}), 404
+            return jsonify({'error': 'No timezone found'})
         
         # Get the time
         timezone = pytz.timezone(timezone_str)
         current_time = datetime.now(timezone)
         
-        # Make a simple string response
-        time_str = current_time.strftime('%I:%M %p')
-        date_str = current_time.strftime('%A, %B %d')
-        tz_str = timezone_str.split('/')[-1].replace('_', ' ')
-        
         return jsonify({
-            'message': f'Time: {time_str}<br>Date: {date_str}<br>Timezone: {tz_str}'
+            'time': current_time.strftime('%I:%M %p'),
+            'date': current_time.strftime('%A, %B %d'),
+            'city': timezone_str.split('/')[-1].replace('_', ' ')
         })
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000))) 
