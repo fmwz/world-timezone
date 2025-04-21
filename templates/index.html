@@ -43,25 +43,36 @@
             {name:'Dubai',country:'UAE',lat:25.2048,lng:55.2708},
             {name:'Sydney',country:'Australia',lat:-33.8688,lng:151.2093}
         ]
+
+        function showTime(data) {
+            var display = document.getElementById('time-display')
+            display.textContent = ''  // Clear existing content
+            var timeInfo = document.createElement('div')
+            timeInfo.innerHTML = data.message
+            display.appendChild(timeInfo)
+        }
+
         map.on('click',function(e){
             if(marker)map.removeLayer(marker)
             marker=L.marker(e.latlng).addTo(map)
             
-            document.getElementById('time-display').innerHTML='Loading...'
+            var display = document.getElementById('time-display')
+            display.textContent = 'Loading...'
             
             fetch('/get_time?lat='+e.latlng.lat+'&lng='+e.latlng.lng)
                 .then(r=>r.json())
-                .then(d=>{
-                    if(d.error){
-                        document.getElementById('time-display').innerHTML='Error: '+d.error
+                .then(data=>{
+                    if(data.error){
+                        display.textContent = 'Error: ' + data.error
                     }else{
-                        document.getElementById('time-display').innerHTML=d.message
+                        showTime(data)
                     }
                 })
                 .catch(e=>{
-                    document.getElementById('time-display').innerHTML='Error getting time'
+                    display.textContent = 'Error getting time'
                 })
         })
+
         function updateCities(){
             var s=document.querySelector('.search-input').value.toLowerCase()
             var h=''
@@ -75,11 +86,13 @@
             })
             document.querySelector('.cities-list').innerHTML=h
         }
+
         function selectCity(lat,lng){
             map.setView([lat,lng],4)
             var clickEvent={latlng:L.latLng(lat,lng)}
             map.fire('click',clickEvent)
         }
+
         updateCities()
         setInterval(updateCities,60000)
         document.querySelector('.search-input').addEventListener('input',updateCities)
